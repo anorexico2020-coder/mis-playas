@@ -1,34 +1,365 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Mis Playas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Playas Favoritas</title>
     <style>
-        body { font-family: Arial; text-align: center; }
-        img { width: 300px; margin: 10px; border-radius: 10px; }
-        h1 { color: #333; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            color: #34495e;
+            font-size: 1.3em;
+        }
+
+        .secciones {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .seccion-btn {
+            background: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 60px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 3px solid transparent;
+            flex: 0 1 auto;
+        }
+
+        .seccion-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .seccion-btn.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-color: white;
+        }
+
+        .gallery-container {
+            min-height: 500px;
+        }
+
+        .gallery {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .gallery.active {
+            display: grid;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            aspect-ratio: 4/3;
+            background: #f0f0f0;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item .foto-nombre {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 20px 15px 10px;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .foto-nombre {
+            opacity: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 3px solid white;
+            box-shadow: 0 0 50px rgba(255,255,255,0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            color: white;
+            font-size: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 1001;
+        }
+
+        .close-modal:hover {
+            color: #3498db;
+        }
+
+        .no-fotos {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 20px;
+            color: #7f8c8d;
+            font-size: 1.5em;
+            border: 3px dashed #bdc3c7;
+        }
+
+        .no-fotos span {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .secciones {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .seccion-btn {
+                padding: 15px 30px;
+                font-size: 1.5em;
+                width: 100%;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .close-modal {
+                top: 20px;
+                right: 30px;
+                font-size: 40px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>🏖️ Puerto Francés y Chirimena</h1>
-    
-    <h2>🏝️ Puerto Francés</h2>
-    <img src="puerto-frances/imagen1.jpg">
-    <img src="puerto-frances/imagen2.jpg">
-    <img src="puerto-frances/imagen3.jpg">
-    <img src="puerto-frances/imagen4.jpg">
-    <img src="puerto-frances/imagen5.jpg">
-    <img src="puerto-frances/imagen6.jpg">
-    <img src="puerto-frances/imagen7.jpg">
-    <img src="puerto-frances/imagen8.jpg">
-    
-    <h2>🌊 Chirimena</h2>
-    <img src="chirimena/imagen1.jpg">
-    <img src="chirimena/imagen2.jpg">
-    <img src="chirimena/imagen3.jpg">
-    <img src="chirimena/imagen4.jpg">
-    <img src="chirimena/imagen5.jpg">
-    <img src="chirimena/imagen6.jpg">
-    <img src="chirimena/imagen7.jpg">
-    <img src="chirimena/imagen8.jpg">
+    <div class="container">
+        <header>
+            <h1>🏖️ Mis Playas Favoritas</h1>
+            <p>Puerto Francés y Chirimena</p>
+        </header>
+
+        <div class="secciones">
+            <button class="seccion-btn active" onclick="cambiarSeccion('puerto-frances')">
+                <span>🏝️</span> Puerto Francés
+            </button>
+            <button class="seccion-btn" onclick="cambiarSeccion('chirimena')">
+                <span>🌊</span> Chirimena
+            </button>
+        </div>
+
+        <div class="gallery-container">
+            <div id="gallery-puerto-frances" class="gallery active"></div>
+            <div id="gallery-chirimena" class="gallery"></div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal" onclick="cerrarModal()">
+        <span class="close-modal" onclick="cerrarModal()">&times;</span>
+        <img class="modal-content" id="modal-img">
+    </div>
+
+    <script>
+        // Lista de imágenes
+        const fotos = {
+            'puerto-frances': [
+                'imagen1.jpg', 'imagen2.jpg', 'imagen3.jpg', 'imagen4.jpg',
+                'imagen5.jpg', 'imagen6.jpg', 'imagen7.jpg', 'imagen8.jpg'
+            ],
+            'chirimena': [
+                'imagen1.jpg', 'imagen2.jpg', 'imagen3.jpg', 'imagen4.jpg',
+                'imagen5.jpg', 'imagen6.jpg', 'imagen7.jpg', 'imagen8.jpg'
+            ]
+        };
+
+        // Variable para la imagen actual en el modal
+        let imagenActual = '';
+
+        // Cargar las fotos cuando la página se abre
+        window.onload = function() {
+            console.log("🚀 Cargando galerías...");
+            cargarGaleria('puerto-frances');
+            cargarGaleria('chirimena');
+            
+            // Cerrar modal con tecla ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cerrarModal();
+                }
+            });
+        };
+
+        function cargarGaleria(seccion) {
+            const gallery = document.getElementById(`gallery-${seccion}`);
+            const listaFotos = fotos[seccion];
+            
+            gallery.innerHTML = '';
+            
+            if (!listaFotos || listaFotos.length === 0) {
+                gallery.innerHTML = `<div class="no-fotos"><span>📷</span><p>No hay fotos en ${seccion}</p></div>`;
+                return;
+            }
+
+            listaFotos.forEach((foto, index) => {
+                const ruta = `${seccion}/${foto}`;
+                
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                
+                const img = document.createElement('img');
+                img.src = ruta;
+                img.alt = `${seccion} - Foto ${index + 1}`;
+                img.loading = 'lazy';
+                
+                // Mostrar nombre de la foto al hacer hover
+                const nombreFoto = document.createElement('div');
+                nombreFoto.className = 'foto-nombre';
+                nombreFoto.textContent = foto;
+                
+                img.onerror = function() {
+                    console.log(`❌ Error cargando: ${ruta}`);
+                    this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect width="200" height="150" fill="%23f0f0f0"/><text x="100" y="80" font-size="16" text-anchor="middle" fill="%23999">📷 Foto no disponible</text></svg>';
+                };
+                
+                img.onclick = function() {
+                    abrirModal(ruta, foto);
+                };
+                
+                item.appendChild(img);
+                item.appendChild(nombreFoto);
+                gallery.appendChild(item);
+            });
+        }
+
+        function cambiarSeccion(seccion) {
+            // Actualizar botones
+            document.querySelectorAll('.seccion-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Actualizar galerías
+            document.querySelectorAll('.gallery').forEach(gallery => {
+                gallery.classList.remove('active');
+            });
+            document.getElementById(`gallery-${seccion}`).classList.add('active');
+        }
+
+        function abrirModal(ruta, nombreFoto) {
+            const modal = document.getElementById('modal');
+            const modalImg = document.getElementById('modal-img');
+            modalImg.src = ruta;
+            modalImg.alt = nombreFoto;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Evitar scroll
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restaurar scroll
+        }
+
+        // Función para navegar entre fotos (opcional)
+        function fotoAnterior() {
+            // Implementar si quieres navegación
+        }
+
+        function fotoSiguiente() {
+            // Implementar si quieres navegación
+        }
+    </script>
 </body>
 </html>
